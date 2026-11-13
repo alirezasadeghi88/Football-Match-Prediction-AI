@@ -7,6 +7,7 @@ The project starts from basic Python programming and gradually develops into a c
 
 ---
 
+
 # 🎯 Project Objective
 
 The main objective is to build a system that analyzes historical football matches and predicts the possible outcome of a new match.
