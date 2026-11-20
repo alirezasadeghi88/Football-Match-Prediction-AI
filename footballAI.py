@@ -30,3 +30,22 @@ CREATE TABLE IF NOT EXISTS matches (
 
 # ذخیره تغییرات در دیتابیس
 conn.commit()
+
+
+def add_team(name):
+
+    try:
+        # اضافه کردن نام تیم به جدول
+        cursor.execute(
+            "INSERT INTO teams (name) VALUES (?)",
+            (name,)
+        )
+
+        # ذخیره اطلاعات
+        conn.commit()
+
+        print("تیم با موفقیت اضافه شد!")
+
+    except sqlite3.IntegrityError:
+        # جلوگیری از ثبت نام تکراری
+        print("این تیم قبلاً ثبت شده است!")
