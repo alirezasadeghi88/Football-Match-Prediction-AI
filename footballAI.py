@@ -138,3 +138,23 @@ def get_stats(team):
         "draws": draws,
         "losses": losses
     }
+    
+    
+
+def show_stats(team):
+
+    # دریافت آمار تیم
+    stats = get_stats(team)
+
+    if stats is None:
+        print("اطلاعات مسابقه‌ای برای این تیم وجود ندارد!")
+        return
+
+    print("\nنام تیم:", team)
+    print("تعداد بازی:", stats["games"])
+    print("میانگین گل زده:", round(stats["gf"], 2))
+    print("میانگین گل خورده:", round(stats["ga"], 2))
+    print("امتیازات:", stats["points"])
+    print("تعداد برد:", stats["wins"])
+    print("تعداد مساوی:", stats["draws"])
+    print("تعداد باخت:", stats["losses"])
