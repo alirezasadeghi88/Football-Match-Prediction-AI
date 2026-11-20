@@ -49,3 +49,92 @@ def add_team(name):
     except sqlite3.IntegrityError:
         # جلوگیری از ثبت نام تکراری
         print("این تیم قبلاً ثبت شده است!")
+        
+        
+def add_match(home, away, hg, ag):
+
+    # بررسی وجود تیم‌ها در دیتابیس
+    cursor.execute(
+        "SELECT name FROM teams WHERE name IN (?, ?)",
+        (home, away)
+    )
+
+    found = {row[0] for row in cursor.fetchall()}
+
+    if home not in found or away not in found:
+        print("یک یا هر دو تیم در دیتابیس وجود ندارند!")
+        return
+
+    # بررسی معتبر بودن اطلاعات
+    if home == away or hg < 0 or ag < 0:
+        print("اطلاعات مسابقه نامعتبر است!")
+        return
+
+    # ذخیره مسابقه در دیتابیس
+    cursor.execute("""
+        INSERT INTO matches
+        (home_team, away_team, home_goals, away_goals)
+        VALUES (?, ?, ?, ?)
+    """, (home, away, hg, ag))
+
+    conn.commit()
+
+    print("مسابقه با موفقیت ذخیره شد!")
+    
+    
+def get_stats(team):
+
+    # دریافت مسابقات تیم از دیتابیس
+    cursor.execute("""
+        SELECT home_team, away_team, home_goals, away_goals
+        FROM matches
+        WHERE home_team = ? OR away_team = ?
+    """, (team, team))
+
+    games = cursor.fetchall()
+
+    # بررسی وجود مسابقه
+    if not games:
+        return None
+
+    # مقداردهی اولیه آمار
+    gf = ga = points = wins = draws = losses = 0
+
+    # بررسی مسابقات
+    for home, away, hg, ag in games:
+
+        # تشخیص میزبان یا مهمان بودن تیم
+        if home == team:
+            scored, conceded = hg, ag
+        else:
+            scored, conceded = ag, hg
+
+        # محاسبه گل زده و خورده
+        gf += scored
+        ga += conceded
+
+        # محاسبه نتیجه مسابقه
+        if scored > conceded:
+            wins += 1
+            points += 3
+
+        elif scored == conceded:
+            draws += 1
+            points += 1
+
+        else:
+            losses += 1
+
+    # تعداد کل مسابقات
+    total = len(games)
+
+    # برگرداندن آمار تیم
+    return {
+        "games": total,
+        "gf": gf / total,
+        "ga": ga / total,
+        "points": points,
+        "wins": wins,
+        "draws": draws,
+        "losses": losses
+    }
